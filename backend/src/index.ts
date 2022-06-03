@@ -93,7 +93,7 @@ app.use('/api', api);
 /** Start a server */
 (async () => {
     await mongoose.connect(AppConfig.DB_SERVER)
-        .then(() => logger("Server", "Syncing database", "🚀", "😃"))
+        .then(() => logger("Server", "Syncing database hahaha", "🚀", "😃"))
         .catch((err) =>
             logger("Server", err, "🚨", "😭", "error")
         );
