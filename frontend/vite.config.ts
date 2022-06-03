@@ -63,6 +63,15 @@ export default defineConfig({
     },
     port: 5377
   },
+  preview: {
+    proxy: {
+      "/api": {
+        target: "http://localhost:5378",
+        changeOrigin: true,
+      },
+    },
+    port: 5377
+  },
   build: {
     sourcemap: false,
     rollupOptions: {
