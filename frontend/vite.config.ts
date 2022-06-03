@@ -57,10 +57,11 @@ export default defineConfig({
   server: {
     proxy: {
       "/api": {
-        target: "http://localhost:8080",
+        target: "http://localhost:5378",
         changeOrigin: true,
       },
     },
+    port: 5377
   },
   build: {
     sourcemap: false,
