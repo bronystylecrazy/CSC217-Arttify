@@ -51,10 +51,9 @@ app.use(express.urlencoded({ extended: true }));
 
 /** Plugins */
 app.use(
-    cors({
-        origin: "*",
-    })
+    cors()
 );
+
 app.use(cookieParser());
 
 /** Json Web Token */
