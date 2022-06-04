@@ -16,11 +16,11 @@ export function onMessage<T = any>(event, cb: (data: T) => void) {
 
 
 function useSocket<T = any>(options: Options = {}) {
-    const socket = useSocketIO(`http://127.0.0.1:5378`, {
+    const socket = useSocketIO(`https://arttifysocket.devsirawit.com`, {
         share: true,
         fromSocketIO: true,
         shouldReconnect: (closeEvent) => true,
-        reconnectInterval: 1000,
+        reconnectInterval: 5000,
     });
 
     return { ...socket, lastJsonMessage: socket.lastJsonMessage as T };

@@ -133,7 +133,7 @@ app.use('/api', api);
     });
 
     socketio.setSocket(io);
-
+    console.log('Initialized socketio');
     io.on('connection', (sk) => {
         socketio.setUsers([]);
         for (let [id] of Object.entries(io.of('/').sockets)) {
