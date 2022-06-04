@@ -70,7 +70,6 @@ export default defineConfig({
         changeOrigin: true,
       },
     },
-
     port: 5377
   },
   build: {
