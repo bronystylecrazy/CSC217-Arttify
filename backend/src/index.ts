@@ -89,9 +89,8 @@ api.use("/repo", repoRoute);
 
 // for testing only
 api.get("/", async (req, res) => {
-    // return res.send("It works! 😃 Thanks gods!");
-    const users = await User.find({});
-    return res.json(users);
+    return res.send("It works! 😃 Thanks gods!");
+    // return res.json(users);
 });
 
 app.use('/api', api);
