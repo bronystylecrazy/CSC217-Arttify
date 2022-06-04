@@ -117,7 +117,8 @@ app.use('/api', api);
     });
 
     const io = socketioServer(server, {
-        cors: "http://127.0.0.1:5377"
+        cors: "http://127.0.0.1:5377",
+        credentials: true
     });
 
     io.use((socket: any, next) => {
