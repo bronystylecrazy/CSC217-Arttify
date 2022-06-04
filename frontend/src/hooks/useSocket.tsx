@@ -20,11 +20,7 @@ function useSocket<T = any>(options: Options = {}) {
         share: true,
         fromSocketIO: true,
         shouldReconnect: (closeEvent) => true,
-        reconnectInterval: 5000,
-        eventSourceOptions: {
-            withCredentials: true,
-        }
-    });
+        reconnectInterval: 5000);
 
     return { ...socket, lastJsonMessage: socket.lastJsonMessage as T };
 };
