@@ -51,7 +51,7 @@ app.use(express.urlencoded({ extended: true }));
 
 /** Plugins */
 app.use(
-    cors()
+    cors("*")
 );
 app.use(cookieParser());
 
