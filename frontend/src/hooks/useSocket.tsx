@@ -21,8 +21,8 @@ function useSocket<T = any>(options: Options = {}) {
         fromSocketIO: true,
         shouldReconnect: (closeEvent) => true,
         reconnectInterval: 5000,
-        queryParams: {
-            token: Cookies.get("token")
+        eventSourceOptions: {
+            withCredentials: true,
         }
     });
 
