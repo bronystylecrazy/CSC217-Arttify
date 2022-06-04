@@ -116,6 +116,7 @@ app.use('/api', api);
 
     io.use((socket: any, next) => {
         const token = socket.handshake.headers["cookie"];
+        console.log(token)
         if (!token || token.length <= 0) {
             return next(new Error("Token required!"));
         }

@@ -16,7 +16,7 @@ export function onMessage<T = any>(event, cb: (data: T) => void) {
 
 
 function useSocket<T = any>(options: Options = {}) {
-    const socket = useSocketIO(`https://arttifysocket.devsirawit.com`, {
+    const socket = useSocketIO(`https://rt.devsirawit.com`, {
         share: true,
         fromSocketIO: true,
         shouldReconnect: (closeEvent) => true,
