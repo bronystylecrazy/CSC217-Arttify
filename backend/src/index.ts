@@ -52,7 +52,7 @@ app.use(express.urlencoded({ extended: true }));
 /** Plugins */
 app.use(
     cors({
-        origin: "http://localhost:5377",
+        origin: "*",
     })
 );
 app.use(cookieParser());
