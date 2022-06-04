@@ -52,7 +52,8 @@ app.use(express.urlencoded({ extended: true }));
 /** Plugins */
 app.use(
     cors({
-        origin: "http://127.0.0.1:5377"
+        origin: "http://127.0.0.1:5377",
+        withCreditentials: true,
     })
 );
 
