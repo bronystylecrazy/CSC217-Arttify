@@ -51,7 +51,7 @@ app.use(express.urlencoded({ extended: true }));
 
 /** Plugins */
 app.use(
-    cors("*")
+    cors("http://127.0.0.1:5377")
 );
 app.use(cookieParser());
 
