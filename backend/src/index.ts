@@ -112,7 +112,9 @@ app.use('/api', api);
         );
     });
 
-    const io = socketioServer(server);
+    const io = socketioServer(server, {
+        cors: "http://127.0.0.1:5377"
+    });
 
     io.use((socket: any, next) => {
         const token = socket.handshake.headers["cookie"];
