@@ -1,17 +1,50 @@
+import useRepository from "@/hooks/useRepository";
+import useSocket, { onMessage } from "@/hooks/useSocket";
+import { axios } from "@/utils/api";
 import styled from "@emotion/styled";
-import { Alert, Box, Button, Container, OutlinedInput, TextField, Typography } from "@mui/material";
+import { Alert, Box, Button, Container, Menu, MenuItem, OutlinedInput, TextField, Typography } from "@mui/material";
+import { useLayoutEffect, useState } from "react";
 import { BiSearch, BiPlusCircle } from 'react-icons/bi'
+import ImportRepoComponent from "./Sites/importRepo";
 
 const Input = styled('input')({
     display: 'none',
 });
 
 const SitesPage = () => {
+    const { $repository } = useRepository();
+    const [repoLoading, setRepoLoading] = useState(false);
+    const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+    const open = Boolean(anchorEl);
+    const [importRepo, setImportRepo] = useState(false);
+
+    onMessage('message', (message) => {
+        console.log(message)
+    });
+
+    const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+        setAnchorEl(event.currentTarget);
+    };
+
+    const handleClose = () => {
+        setAnchorEl(null);
+    };
+
+    const createFromRepos = () => {
+        // fetchRepo();
+        setImportRepo(true);
+        handleClose();
+    };
+
+    useLayoutEffect(() => {
+        $repository.sync();
+    }, [])
+
     return <Container>
         <Box sx={{ color: 'white', marginTop: '2.5rem', background: '#161f32', padding: '1.5rem', borderRadius: '.5rem' }}>
             <Box display="flex" alignItems="center" justifyContent="space-between">
                 <OutlinedInput size="small" startAdornment={<BiSearch style={{ marginRight: '1rem' }} />} sx={{ maxWidth: '350px', width: '100%' }} inputProps={{ sx: { color: 'white' } }} placeholder="Search your site.." />
-                <Button variant="contained" disableElevation sx={{ marginLeft: '1rem' }} color="success">
+                <Button variant="contained" onClick={handleClick} disableElevation sx={{ marginLeft: '1rem' }} color="success">
                     <BiPlusCircle style={{ marginRight: '.5rem' }} /> Create Site
                 </Button>
             </Box>
@@ -33,6 +66,19 @@ const SitesPage = () => {
                 </Box>
             </Box>
         </Box>
+        <Menu
+            id="basic-menu"
+            anchorEl={anchorEl}
+            open={open}
+            onClose={handleClose}
+            MenuListProps={{
+                'aria-labelledby': 'basic-button',
+            }}
+        >
+            <MenuItem onClick={createFromRepos}>Import repository from github.</MenuItem>
+            {/* <MenuItem onClick={handleClose}>My account</MenuItem> */}
+        </Menu>
+        <ImportRepoComponent show={importRepo} setShow={setImportRepo} />
     </Container>
 };
 

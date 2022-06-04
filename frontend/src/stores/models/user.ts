@@ -2,6 +2,7 @@ import { Profile } from '../../../../backend/src/interfaces/models/User';
 import { createModel } from "@rematch/core";
 import { RootModel } from "..";
 import { axios } from '@/utils/api';
+import Cookies from 'js-cookie';
 
 
 export type UserStoreType = {
@@ -70,6 +71,19 @@ export const user = createModel<RootModel>()({
             } catch (e) {
                 console.error(e);
             }
+        },
+        async sync() {
+            const state = Cookies.get('user');
+            if (state) {
+                dispatch.user.SET_STATE({ isAuthenticated: true });
+            }
+            return state;
+        },
+        async logout() {
+            localStorage.removeItem('repositories');
+            localStorage.removeItem('user');
+            Cookies.remove('user', { path: '/' });
+            dispatch.user.SET_STATE({ isAuthenticated: false, profile: { login: "", id: -1, node_id: "", avatar_url: "", gravatar_id: "", url: "", html_url: "", followers_url: "", following_url: "", gists_url: "", starred_url: "", subscriptions_url: "", organizations_url: "", repos_url: "", events_url: "", received_events_url: "", type: "", site_admin: false, name: "", company: "", blog: "", location: "", email: null, hireable: false, bio: "", twitter_username: null, public_repos: 0, public_gists: 0, followers: 0, following: 0, created_at: new Date(), updated_at: new Date(), } });
         }
     }),
 });

@@ -154,6 +154,8 @@ router.get('/github', async (req, res) => {
         }
     });
 
+    console.log(data);
+
     const response = await axios.get<Profile>(`https://api.github.com/user`, {
         headers: {
             Authorization: `token ${data.access_token}`
@@ -181,23 +183,27 @@ router.get('/github', async (req, res) => {
         token: user.access_token
     }, AppConfig.JWT_SECRET, { expiresIn: '7d' });
 
-    res.cookie("user", jwtToken, {
-        httpOnly: true,
-        secure: true
-    });
+    res.cookie("user", jwtToken,
+        // {
+        //     httpOnly: true,
+        //     secure: true
+        // }
+    );
 
-    console.log(data)
+    // console.log(data)
     return res.redirect('/')
 });
 
 router.get('/me', async (req, res) => {
+    console.log('profile: ', req?.user?.token);
     const response = await axios.get<Profile>(`https://api.github.com/user`, {
         headers: {
-            Authorization: `token ${req.user.token}`
+            Authorization: `token ${req?.user?.token}`
         }
     });
 
     return info<Profile>(res, "Fetch user profile success!", response.data, HttpStatus.OK);
 });
+
 
 export default router;

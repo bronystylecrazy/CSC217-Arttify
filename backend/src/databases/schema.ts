@@ -14,3 +14,7 @@ export const UserSchema = new Schema<User>({
         type: String,
     },
 });
+
+export const RepositorySchema = new Schema({
+    
+});

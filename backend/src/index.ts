@@ -6,10 +6,13 @@ import mongoose from "mongoose";
 import morgan from "morgan";
 import cors from "cors";
 import jwt from "express-jwt";
+import jsonwebtoken from 'jsonwebtoken';
 import cookieParser from "cookie-parser";
+import socketioServer from 'socket.io';
 
 /** Routes */
 import authRoute from "@/routes/auth";
+import repoRoute from "@/routes/repo";
 
 /** Misc */
 import config from "./config";
@@ -20,6 +23,8 @@ import path from "path";
 import { logger } from "@/utils/serviceLog";
 import AppConfig from "./config";
 import { User } from "./databases/model";
+import socketio from "./socket";
+import { spawn } from "child_process";
 
 /** Instantiate Application */
 const app = express();
@@ -76,6 +81,7 @@ const api = express.Router();
 
 /** Routes */
 api.use("/auth", authRoute);
+api.use("/repo", repoRoute);
 // app.use("/storage", storageRoute);
 /** protected Routes */
 // app.use("/event", eventRoute);
@@ -98,7 +104,7 @@ app.use('/api', api);
             logger("Server", err, "🚨", "😭", "error")
         );
 
-    app.listen(config.PORT, "0.0.0.0", () => {
+    const server = app.listen(config.PORT, "0.0.0.0", () => {
         logger(
             "Server",
             `running on port ${chalk.bold(":" + config.PORT)}`,
@@ -106,10 +112,86 @@ app.use('/api', api);
             "😃"
         );
     });
-    // cron.schedule("*/2 * * * *", async function () {
-    //     logger("Server", "Syncing database", "🚀", "😃");
-    //     await initTables().catch((err) =>
-    //         logger("Server", err, "🚨", "😭", "error")
-    //     );
-    // });
+
+    const io = socketioServer(server);
+
+    io.use((socket: any, next) => {
+        const token = socket.handshake.headers["cookie"];
+        if (!token || token.length <= 0) {
+            return next(new Error("Token required!"));
+        }
+
+        try {
+            const user = jsonwebtoken.verify(token.replace('user=', ''), config.JWT_SECRET) as any;
+            socket.user_id = user.id;
+            socket.state = {
+                building: false
+            };
+        } catch (e) {
+            return next(new Error(e.message || "Authentication error!"));
+        }
+        next();
+    });
+
+    socketio.setSocket(io);
+
+    io.on('connection', (sk) => {
+        socketio.setUsers([]);
+        for (let [id] of Object.entries(io.of('/').sockets)) {
+            const socket = io.sockets.sockets[id];
+            socketio.setUser({
+                id: socket.user_id,
+                socket: socket
+            });
+        }
+
+        sk.on('build.start', (message) => {
+            if (!sk.state.building) {
+                console.log('Start building...')
+                sk.state.building = true;
+                try {
+
+                    const cmd = spawn('node', ['index.js'], { stdio: ['inherit', 'pipe', 'pipe'], env: { ...process.env } });
+
+                    // cmd.stdout.on('data', (data) => {
+                    //     sk.emit('build.log', data.toString());
+                    // });
+
+                    // cmd.stderr.on('data', (data) => {
+                    //     io.emit('build.log', data.toString());
+                    // });
+
+                    // cmd.stdout.pipe(process.stdout);
+                    // cmd.stdin.pipe(process.stdin);
+
+                    cmd.stdout.on('data', (data) => {
+                        process.stdout.write(data);
+                        io.emit('build.log', data.toString());
+                    });
+
+                    cmd.stderr.on('data', (data) => {
+                        process.stdout.write(data);
+                        io.emit('build.err', data.toString());
+                    })
+
+                    cmd.stdout.on('end', (code) => {
+                        sk.state.building = false;
+                        sk.emit('build.end', code);
+                    });
+
+                    cmd.on('close', (code) => {
+                        sk.state.building = false;
+                        sk.emit('build.end', code);
+                    });
+                } catch (e) {
+                    // console.log(e);
+                }
+            }
+        });
+    });
+
+    // setInterval(() => {
+    //     io.emit("test", Date.now());
+    // }, 1000);
+
 })();

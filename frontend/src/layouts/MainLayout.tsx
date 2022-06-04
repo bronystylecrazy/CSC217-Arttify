@@ -1,17 +1,24 @@
 import Navbar from "@/components/Navbar";
 import useAuth from "@/hooks/useAuth";
+import useRepository from "@/hooks/useRepository";
+import useSocket from "@/hooks/useSocket";
 import { Box, Button, Container } from "@mui/material";
+import Cookies from "js-cookie";
 import { useEffect, useLayoutEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 
 const MainLayout: React.FC = ({ children }) => {
     const { user, $user } = useAuth();
+    const { $repository } = useRepository();
     const location = useLocation();
+    useSocket();
 
     useLayoutEffect(() => {
-        $user.fetchProfile();
+        if (Cookies.get('user')) {
+            $user.fetchProfile();
+            $repository.sync();
+        }
     }, []);
-
 
     const pages = [{
         name: "Overview",
