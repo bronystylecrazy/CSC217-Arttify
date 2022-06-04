@@ -195,14 +195,18 @@ router.get('/github', async (req, res) => {
 });
 
 router.get('/me', async (req, res) => {
-    console.log('profile: ', req?.user?.token);
-    const response = await axios.get<Profile>(`https://api.github.com/user`, {
-        headers: {
-            Authorization: `token ${req?.user?.token}`
-        }
-    });
+    try {
+        console.log('profile: ', req?.user?.token);
+        const response = await axios.get<Profile>(`https://api.github.com/user`, {
+            headers: {
+                Authorization: `token ${req?.user?.token}`
+            }
+        });
 
-    return info<Profile>(res, "Fetch user profile success!", response.data, HttpStatus.OK);
+        return info<Profile>(res, "Fetch user profile success!", response.data, HttpStatus.OK);
+    } catch (e) {
+        return error(res, e.message, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
 });
 
 
