@@ -31,14 +31,13 @@ const XTerminal = () => {
         prompt();
     });
 
-    
+
     onMessage("build.err", (message) => {
         term.write(`\x1b[31m${message}\x1b[m`);
         prompt();
     });
 
     useEffect(() => {
-        sendMessage(`42["build.start", null]`);
         term = new Terminal({
             convertEol: true,
             fontFamily: `Inconsolata`,
@@ -55,7 +54,7 @@ const XTerminal = () => {
             // foreground: "white"
         });
         term.setOption('cursorBlink', true);
-        // term.write('\x1b[31mWelcome to term.js!\x1b[m\r\n');
+        term.write('\x1b[31mWelcome to Arttify!\x1b[m\r\n');
 
         // Load Fit Addon
         term.loadAddon(fitAddon);

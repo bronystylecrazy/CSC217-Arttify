@@ -140,58 +140,59 @@ router.get('/github/login', async (req, res) => {
 });
 
 router.get('/github', async (req, res) => {
-    const code = req.query.code;
-    const path = req.query.path || '/';
-    const { data } = await axios.post(`https://github.com/login/oauth/access_token`, {}, {
-        params: {
-            client_id: AppConfig.CLIENT_ID,
-            client_secret: AppConfig.SECRET_ID,
-            code,
-            redirect_uri: AppConfig.REDIRECT_URI
-        },
-        headers: {
-            Accept: "application/json"
-        }
-    });
-
-    console.log(data);
-
-    const response = await axios.get<Profile>(`https://api.github.com/user`, {
-        headers: {
-            Authorization: `token ${data.access_token}`
-        }
-    });
-
-    const user = await User.findOne({ username: response.data.login });
-
-    if (!user) {
-        const newUser = new User({
-            username: response.data.login,
-            access_token: data.access_token,
-            refresh_token: data.refresh_token
+    try {
+        const code = req.query.code;
+        const path = req.query.path || '/';
+        const { data } = await axios.post(`https://github.com/login/oauth/access_token`, {}, {
+            params: {
+                client_id: AppConfig.CLIENT_ID,
+                client_secret: AppConfig.SECRET_ID,
+                code,
+                redirect_uri: AppConfig.REDIRECT_URI
+            },
+            headers: {
+                Accept: "application/json"
+            }
         });
-        await newUser.save();
-    } else {
-        user.access_token = data.access_token;
-        user.refresh_token = data.refresh_token;
-        await user.save();
+
+        const response = await axios.get<Profile>(`https://api.github.com/user`, {
+            headers: {
+                Authorization: `token ${data.access_token}`
+            }
+        });
+
+        const user = await User.findOne({ username: response.data.login });
+
+        if (!user) {
+            const newUser = new User({
+                username: response.data.login,
+                access_token: data.access_token,
+                refresh_token: data.refresh_token
+            });
+            await newUser.save();
+        } else {
+            user.access_token = data.access_token;
+            user.refresh_token = data.refresh_token;
+            await user.save();
+        }
+
+        const jwtToken = jwt.sign({
+            id: user._id,
+            username: user.username,
+            token: user.access_token
+        }, AppConfig.JWT_SECRET, { expiresIn: '7d' });
+
+        res.cookie("user", jwtToken,
+            // {
+            //     httpOnly: true,
+            //     secure: true
+            // }
+        );
+
+        return res.redirect('/')
+    } catch (e) {
+        return res.redirect('/')
     }
-
-    const jwtToken = jwt.sign({
-        id: user._id,
-        username: user.username,
-        token: user.access_token
-    }, AppConfig.JWT_SECRET, { expiresIn: '7d' });
-
-    res.cookie("user", jwtToken,
-        // {
-        //     httpOnly: true,
-        //     secure: true
-        // }
-    );
-
-    // console.log(data)
-    return res.redirect('/')
 });
 
 router.get('/me', async (req, res) => {

@@ -14,7 +14,7 @@ const socketio = {
         return this.users;
     },
     getUser(id) {
-        return this.users.find(user => user.id === id).socket;
+        return this.users.find(user => user.id === id)?.socket;
     },
     setSocket(io) {
         this.instance = io;

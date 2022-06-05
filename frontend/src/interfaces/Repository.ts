@@ -115,3 +115,26 @@ export interface Permissions {
     triage: boolean;
     pull: boolean;
 }
+
+export type Building = {
+    _id: string;
+    repository_id: number;
+    owner_id: string;
+    status: string;
+    time: number;
+    created_at: Date;
+    updated_at: Date;
+};
+
+export interface Project {
+    build_cmd: string;
+    build_dir: string;
+    clone_url: string;
+    created_at: Date;
+    full_name: string;
+    id: number;
+    name: string;
+    owner_id: string;
+    status: string;
+    updated_at: Date;
+}

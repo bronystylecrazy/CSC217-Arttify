@@ -16,7 +16,10 @@ export function onMessage<T = any>(event, cb: (data: T) => void) {
 
 
 function useSocket<T = any>(options: Options = {}) {
-    const socket = useSocketIO(`https://rt.devsirawit.com`, {
+
+    const connect = location.hostname === "127.0.0.1" ? "http://127.0.0.1:5378" : `https://rt.devsirawit.com`;
+
+    const socket = useSocketIO(connect, {
         share: true,
         fromSocketIO: true,
         shouldReconnect: (closeEvent) => true,
